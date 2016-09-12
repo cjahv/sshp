@@ -1,0 +1,21 @@
+#server:
+#  port: 8081
+#  sessionTimeout: 1800
+spring:
+  freemarker:
+    enabled: true
+  datasource:
+    url: jdbc:mysql://test.linkcubic.com:9999/lc?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull
+    username: lc
+    password: lc13579
+    driver-class-name: com.mysql.jdbc.Driver
+  jpa.properties:
+      hibernate:
+        hbm2ddl.auto: none
+        current_session_context_class: org.springframework.orm.hibernate5.SpringSessionContext
+logging.level:
+  root: WARN
+  org.hibernate: ERROR
+  org.springframework: DEBUG
+project:
+  support:
