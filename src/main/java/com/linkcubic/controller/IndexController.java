@@ -1,6 +1,5 @@
 package com.linkcubic.controller;
 
-import com.linkcubic.model.entity.user.User;
 import com.support.mcv.controller.BaseController;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
  */
 @Controller
 @RequestMapping("/")
-public class IndexController extends BaseController<User> {
+public class IndexController extends BaseController {
 
     @RequestMapping("index.html")
     public String main() {
