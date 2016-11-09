@@ -1,4 +1,4 @@
-package com.sshp.core.model.dto;
+package com.sshp.core.model.dto.result;
 
 import com.alibaba.fastjson.JSONObject;
 
@@ -6,7 +6,7 @@ public class JsonResult {
 
   private boolean success;            //结果状态
   private String msg;                    //信息
-  private Object bean;                //结果对象
+  private Object data;                //结果对象
   private int hash;
 
   public JsonResult() {
@@ -46,15 +46,12 @@ public class JsonResult {
     return this;
   }
 
-  public Object getBean() {
-    return bean;
+  public Object getData() {
+    return data;
   }
 
-  public JsonResult setBean(Object bean) {
-//        if (bean instanceof DataResult) {
-//            throw new SystemException("不能将数据集直接返回给用户!");
-//        }
-    this.bean = bean;
+  public JsonResult setData(Object data) {
+    this.data = data;
     return this;
   }
 

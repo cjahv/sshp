@@ -1,7 +1,7 @@
 package com.sshp.mcv.controller;
 
 import com.sshp.config.SpringBean;
-import com.sshp.core.model.dto.JsonResult;
+import com.sshp.core.model.dto.result.JsonResult;
 import com.sshp.core.model.entity.BaseEntityImpl;
 import com.sshp.mcv.manage.MvcManage;
 import com.sshp.mcv.service.BaseService;

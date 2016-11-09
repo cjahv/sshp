@@ -2,11 +2,11 @@ package com.sshp.mcv.manage;
 
 import com.sshp.core.model.entity.BaseEntityImpl;
 import com.sshp.plugins.hibernate.core.filter.Filter;
+import com.sshp.plugins.hibernate.core.filter.Order;
 import com.sshp.plugins.hibernate.core.impl.Condition;
 import com.sshp.plugins.hibernate.select.DataFilter;
 import com.sshp.plugins.hibernate.select.DataResult;
 import org.hibernate.Query;
-import org.hibernate.criterion.Order;
 
 /**
  * 内容摘要 ：基础数据层和基础业务层接口

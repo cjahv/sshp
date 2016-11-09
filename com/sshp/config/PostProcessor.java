@@ -4,15 +4,17 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 /**
- * 内容摘要 ：
+ * 内容摘要 ：获取BeanDefinitionRegistry
  * 创建人　 ：陈佳慧
  * 创建日期 ：16/8/13
  */
 @Component
-public class PostProcessor implements BeanDefinitionRegistryPostProcessor {
+@Lazy(false)
+class PostProcessor implements BeanDefinitionRegistryPostProcessor {
   BeanDefinitionRegistry beanDefinitionRegistry;
 
   @Override

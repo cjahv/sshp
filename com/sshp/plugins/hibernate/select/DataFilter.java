@@ -4,10 +4,10 @@ import com.sshp.core.model.entity.BaseEntityImpl;
 import com.sshp.plugins.hibernate.core.KeyCore;
 import com.sshp.plugins.hibernate.core.criterion.SQLProjection;
 import com.sshp.plugins.hibernate.core.filter.Filter;
+import com.sshp.plugins.hibernate.core.filter.Order;
 import com.sshp.plugins.hibernate.core.filter.Other;
 import org.apache.commons.lang3.ArrayUtils;
 import org.hibernate.Criteria;
-import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projection;
 import org.hibernate.sql.JoinType;
 

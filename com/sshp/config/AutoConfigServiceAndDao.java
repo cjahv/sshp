@@ -13,7 +13,8 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 
 /**
- * 内容摘要 ：
+ * 内容摘要 ：自动装载 hibernate 的所有 model 的 service 和 dao
+ * 自动注入时 使用的变量名为 model 名首字母小写 + BaseDao/BaseService
  * 创建人　 ：陈佳慧
  * 创建日期 ：16/8/13
  */

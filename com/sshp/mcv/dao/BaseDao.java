@@ -7,6 +7,7 @@ import com.sshp.mcv.exception.MVCException;
 import com.sshp.mcv.manage.BaseServiceAndDaoImpl;
 import com.sshp.mcv.manage.MvcManage;
 import com.sshp.plugins.hibernate.core.filter.Filter;
+import com.sshp.plugins.hibernate.core.filter.Order;
 import com.sshp.plugins.hibernate.core.filter.Other;
 import com.sshp.plugins.hibernate.core.impl.Condition;
 import com.sshp.plugins.hibernate.delete.Delete;
@@ -15,7 +16,6 @@ import com.sshp.plugins.hibernate.select.DataFilter;
 import com.sshp.plugins.hibernate.select.DataResult;
 import com.sshp.plugins.hibernate.update.Update;
 import org.hibernate.Query;
-import org.hibernate.criterion.Order;
 
 
 /**
