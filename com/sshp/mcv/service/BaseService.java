@@ -63,12 +63,12 @@ public class BaseService<T extends BaseEntityImpl> extends MvcManage<T> implemen
   }
 
   @Override
-  public DataResult<T> get(Order... orders) {
+  public DataResult<T> get(com.sshp.plugins.hibernate.core.filter.Order... orders) {
     return dao.get(orders);
   }
 
   @Override
-  public DataResult<T> get(String key, Order... orders) {
+  public DataResult<T> get(String key, com.sshp.plugins.hibernate.core.filter.Order... orders) {
     return dao.get(key, orders);
   }
 

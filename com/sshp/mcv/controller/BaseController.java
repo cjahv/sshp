@@ -6,6 +6,7 @@ import com.sshp.core.model.entity.BaseEntityImpl;
 import com.sshp.mcv.manage.MvcManage;
 import com.sshp.mcv.service.BaseService;
 import com.sshp.utils.DateUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.ServletRequestDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
@@ -18,13 +19,12 @@ import java.beans.PropertyEditorSupport;
 import java.util.Date;
 
 /**
- * 内容摘要 ：
+ * 内容摘要 ：基础控制器
  * 创建人　 ：陈佳慧
  * 创建日期 ：16/8/13
  */
-public class BaseController<T extends BaseEntityImpl> extends MvcManage<T> {
+public abstract class BaseController<T extends BaseEntityImpl> extends MvcManage<T> {
   private ThreadLocal<ModelMap> modelMapThread = new ThreadLocal<>();//视图结果数据线程池
-  private ThreadLocal<JsonResult> jsonThread = new ThreadLocal<>();//json结果线程池
   private ThreadLocal<HttpServletRequest> requestThread = new ThreadLocal<>();//request线程池
   private ThreadLocal<HttpServletResponse> responseThread = new ThreadLocal<>();//response线程池
   protected BaseService<T> service;
@@ -39,42 +39,45 @@ public class BaseController<T extends BaseEntityImpl> extends MvcManage<T> {
   }
 
   protected JsonResult json() {
-    JsonResult jsonResult = jsonThread.get();
-    if (jsonResult == null) {
-      jsonResult = new JsonResult();
-      jsonThread.set(jsonResult);
-    } else {
-      if (!jsonResult.isSuccess() || jsonResult.getMsg() != null) {
-        jsonThread.set(null);
-        jsonResult = new JsonResult();
-      }
-    }
-    return jsonResult;
+    return new JsonResult();
   }
 
   protected JsonResult json(String error) {
-    jsonThread.set(null);
     return new JsonResult(false, error);
   }
 
-  private HttpServletRequest request() {
+  protected HttpServletRequest request() {
     return requestThread.get();
   }
 
-  public HttpSession session() {
+  protected HttpSession session() {
     return request().getSession();
   }
 
-  public HttpServletResponse response() {
+  protected HttpServletResponse response() {
     return responseThread.get();
   }
 
-  public String getParameter(String key) {
+  protected String getParameter(String key) {
     return request().getParameter(key);
   }
 
-  public ModelMap model() {
+  protected ModelMap model() {
     return modelMapThread.get();
+  }
+
+  protected String getRequestIp() {
+    String ip = request().getHeader("x-forwarded-for");
+    if (StringUtils.isEmpty(ip) || "unknown".equalsIgnoreCase(ip)) {
+      ip = request().getRemoteAddr();
+    }
+    if (ip != null && ip.length() > 15) {
+      int index = ip.indexOf(',');
+      if (index > 0) {
+        ip = ip.substring(0, index);
+      }
+    }
+    return ip;
   }
 
   @InitBinder
