@@ -1,6 +1,7 @@
 package com.sshp.plugins.hibernate.select;
 
 import com.sshp.core.model.entity.BaseEntityImpl;
+import com.sshp.mcv.entity.ReEntityImpl;
 import com.sshp.plugins.hibernate.core.KeyCore;
 import com.sshp.plugins.hibernate.core.criterion.SQLProjection;
 import com.sshp.plugins.hibernate.core.filter.Filter;
@@ -11,10 +12,7 @@ import org.hibernate.Criteria;
 import org.hibernate.criterion.Projection;
 import org.hibernate.sql.JoinType;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * 内容摘要 ：查询条件超集
@@ -48,10 +46,16 @@ public class DataFilter<T extends BaseEntityImpl> extends KeyCore {
     return this;
   }
 
-  private Filter[] filters;
+  private Set<Filter> filters = new HashSet<>();
+  private boolean existDeleteStatus;
 
   public DataFilter<T> filter(Filter... filters) {
-    this.filters = ArrayUtils.addAll(this.filters, filters);
+    for (Filter filter : filters) {
+      if (!existDeleteStatus && filter.getName().charAt(0) == 'd' && filter.getName().charAt(6) == 'S' && filter.getName().equals("deleteStatus")) {
+        existDeleteStatus = true;
+      }
+      this.filters.add(filter);
+    }
     return this;
   }
 
@@ -69,10 +73,17 @@ public class DataFilter<T extends BaseEntityImpl> extends KeyCore {
 
   private void build() {
     resolveFilter.buildKey(this.keys);
+    if (entityClass.isAssignableFrom(ReEntityImpl.class) && !existDeleteStatusFilter()) {
+      this.filter(Filter.eq("deleteStatus", false));
+    }
     resolveFilter.buildFilter(this.filters);
     resolveFilter.buildOrder(this.orders);
     resolveFilter.buildPage(this.start, this.length);
     list = resolveFilter.list();
+  }
+
+  private boolean existDeleteStatusFilter() {
+    return existDeleteStatus;
   }
 
   public DataFilter<T> projection(Projection... projections) {
@@ -102,8 +113,10 @@ public class DataFilter<T extends BaseEntityImpl> extends KeyCore {
 
   public DataFilter<T> other(Other other) {
     switch (other.getIndex()) {
-      case 0:return this.one();
-      case 1:return this.all();
+      case 0:
+        return this.one();
+      case 1:
+        return this.all();
       case 2:
         this.length((Integer) other.getArgs(1));
         this.start((Integer) other.getArgs(0));

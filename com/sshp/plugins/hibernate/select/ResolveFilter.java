@@ -1,13 +1,14 @@
 package com.sshp.plugins.hibernate.select;
 
-import com.sshp.plugins.hibernate.core.filter.Filter;
 import com.sshp.plugins.hibernate.core.criterion.SOrder;
+import com.sshp.plugins.hibernate.core.filter.Filter;
 import com.sshp.utils.Reflex;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.*;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * 内容摘要 ：
@@ -57,7 +58,7 @@ public class ResolveFilter extends GenerateFilter {
     if (pList.getLength() > 0) criteria.setProjection(pList);
   }
 
-  void buildFilter(Filter[] filters) {
+  void buildFilter(Set<Filter> filters) {
     if (filters != null) {
       for (Filter filter : filters) {
         Criterion criterion = super.buildFilter(filter);

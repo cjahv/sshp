@@ -19,8 +19,8 @@ import java.util.Set;
 public abstract class KeyCore extends SessionCore {
 
   protected <T extends BaseEntityImpl> String[] compileKeys(String keys, Class<T> entityClass) {
-    if (keys.indexOf(',') > 0) keys = compileKey(keys);
-    if (keys.indexOf('*') >= 0) return compileHash(StringUtils.split(keys, ','), entityClass);
+    keys = compileKey(keys);
+    if (keys.indexOf('*') >= 0||keys.indexOf('}') > 0) return compileHash(StringUtils.split(keys, ','), entityClass);
     else return StringUtils.split(keys, ',');
   }
 
@@ -28,7 +28,7 @@ public abstract class KeyCore extends SessionCore {
     Map<String, ClassMetadata> map = sessionFactory.getAllClassMetadata();
     Set<String> keySet = new HashSet<>();
     for (String key : keys) {
-      if (key.charAt(key.length() - 1) == '*') {
+      if (key.charAt(key.length() - 1) == '*'||key.charAt(key.length() - 1) == '}') {
         Class targetClass = entityClass;
         int end = key.indexOf('{');
         String[] exp = null;
@@ -37,7 +37,9 @@ public abstract class KeyCore extends SessionCore {
         }
         if (end < 0) end = key.length() - 1;
         String parent = key.substring(0, end);
-        if (parent.length() > 0) keySet.remove(parent.substring(0, parent.length() - 1));
+        if (parent.length() > 0) {
+          if(parent.charAt(parent.length()-1)!='.') parent += '.';
+        }
         String[] sn = StringUtils.split(parent, '.');
         for (String aSn : sn) {
           Method method = Reflex.getGetMethod(aSn, targetClass);

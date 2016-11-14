@@ -10,7 +10,6 @@ import com.sshp.plugins.hibernate.core.impl.Condition;
 import com.sshp.plugins.hibernate.select.DataFilter;
 import com.sshp.plugins.hibernate.select.DataResult;
 import org.hibernate.Query;
-import org.hibernate.criterion.Order;
 import org.springframework.transaction.annotation.Transactional;
 
 /**

@@ -1,9 +1,9 @@
 package com.sshp.plugins.hibernate.update;
 
 import com.sshp.core.model.entity.BaseEntityImpl;
-import com.sshp.plugins.hibernate.core.filter.Filter;
 import com.sshp.plugins.hibernate.core.WhereCore;
 import com.sshp.plugins.hibernate.core.WhereResult;
+import com.sshp.plugins.hibernate.core.filter.Filter;
 import com.sshp.utils.Reflex;
 import org.hibernate.Query;
 import org.springframework.util.StringUtils;
