@@ -5,8 +5,8 @@ package com.sshp.core.model.entity;
  * 创建人　 ：陈佳慧
  * 创建日期 ：16/8/13
  */
-public interface BaseEntityImpl {
-  Long getId();
+public interface BaseEntityImpl<T> {
+  T getId();
 
-  void setId(Long id);
+  void setId(T id);
 }

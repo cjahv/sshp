@@ -22,6 +22,10 @@ public enum ExceptionEnum {
    * 将错误以消息方式提示
    */
   message,
+  /**
+   * 不展示详细消息
+   */
+  info,
 
   //删除错误
 

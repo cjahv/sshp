@@ -12,7 +12,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "s_routing_domain")
-public class Domain implements BaseEntityImpl {
+public class Domain implements BaseEntityImpl<Long> {
   @Override
   public Long getId() {
     return null;

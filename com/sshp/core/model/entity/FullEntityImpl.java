@@ -6,7 +6,7 @@ import java.util.Date;
  * 完整实体接口
  * Created by jahv on 2016/11/14.
  */
-public interface FullEntityImpl<T extends BaseEntityImpl> extends BaseEntityImpl{
+public interface FullEntityImpl<T extends BaseEntityImpl>{
   Date getCreateDate();
 
   void setCreateDate(Date createDate);

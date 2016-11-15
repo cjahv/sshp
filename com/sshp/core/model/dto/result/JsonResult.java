@@ -13,19 +13,9 @@ public class JsonResult {
     this.success = true;
   }
 
-  public JsonResult(boolean success) {
-    this.success = success;
-  }
-
   public JsonResult(boolean success, String msg) {
     this.success = success;
     this.msg = msg;
-  }
-
-  public JsonResult set(boolean success, String msg) {
-    this.success = success;
-    this.msg = msg;
-    return this;
   }
 
   public boolean isSuccess() {
