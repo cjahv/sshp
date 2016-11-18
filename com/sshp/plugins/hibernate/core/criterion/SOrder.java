@@ -1,7 +1,6 @@
 package com.sshp.plugins.hibernate.core.criterion;
 
-import com.sshp.core.model.entity.BaseEntityImpl;
-import org.hibernate.criterion.Order;
+import com.sshp.plugins.hibernate.core.filter.Order;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,8 +10,8 @@ import java.util.Map;
  * 创建人　 ：陈佳慧
  * 创建日期 ：16/9/9
  */
-public abstract class SOrder<T extends BaseEntityImpl> extends Order {
-  private Map<String, Integer> aliasMap = new HashMap<>();
+public abstract class SOrder extends Order {
+  protected Map<String, Integer> aliasMap = new HashMap<>();
 
   /**
    * Constructor for Order.  Order instances are generally created by factory methods.

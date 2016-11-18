@@ -35,7 +35,7 @@ public class Order extends org.hibernate.criterion.Order implements OrderConditi
    * @param propertyName The property to order on
    * @return The build Order instance
    */
-  public static org.hibernate.criterion.Order desc(String propertyName) {
+  public static Order desc(String propertyName) {
     return new Order(propertyName, false);
   }
 

@@ -1,6 +1,8 @@
 package com.sshp.mcv.service;
 
 import com.sshp.config.SpringBean;
+import com.sshp.core.model.dto.page.Page;
+import com.sshp.core.model.dto.result.PageResult;
 import com.sshp.core.model.entity.BaseEntityImpl;
 import com.sshp.mcv.dao.BaseDao;
 import com.sshp.mcv.manage.BaseServiceAndDaoImpl;
@@ -10,6 +12,7 @@ import com.sshp.plugins.hibernate.core.impl.Condition;
 import com.sshp.plugins.hibernate.select.DataFilter;
 import com.sshp.plugins.hibernate.select.DataResult;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -19,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Transactional
 public class BaseService<T extends BaseEntityImpl> extends MvcManage<T> implements BaseServiceAndDaoImpl<T> {
-  private BaseDao<T> dao;
+  protected BaseDao<T> dao;
 
   public BaseService() {
     super();
@@ -32,18 +35,23 @@ public class BaseService<T extends BaseEntityImpl> extends MvcManage<T> implemen
   }
 
   @Override
-  public long count() {
+  public Integer count() {
     return dao.count();
   }
 
   @Override
-  public long count(Filter... filters) {
+  public Integer count(Filter... filters) {
     return dao.count(filters);
   }
 
   @Override
   public T get(Long id) {
     return dao.get(id);
+  }
+
+  @Override
+  public T get(String key, Long id) {
+    return dao.get(key, id);
   }
 
   @Override
@@ -84,6 +92,11 @@ public class BaseService<T extends BaseEntityImpl> extends MvcManage<T> implemen
   @Override
   public DataResult<T> get(DataFilter<T> filter) {
     return dao.get(filter);
+  }
+
+  @Override
+  public PageResult get(Page<T> page) {
+    return dao.get(page);
   }
 
   @Override
@@ -129,5 +142,10 @@ public class BaseService<T extends BaseEntityImpl> extends MvcManage<T> implemen
   @Override
   public Query getNamedQuery(String name) {
     return dao.getNamedQuery(name);
+  }
+
+  @Override
+  public SQLQuery executeSql(String sql) {
+    return dao.executeSql(sql);
   }
 }

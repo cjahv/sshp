@@ -40,7 +40,7 @@ public class ResolveFilter extends GenerateFilter {
           if ("group".equals(model)) {
             projection = Projections.groupProperty(key);
           } else {
-            projection = (Projection) Reflex.invokeStaticMethod(Projections.class, key, model);
+            projection = (Projection) Reflex.invokeStaticMethod(Projections.class, model, key);
           }
         } else {
           projection = Projections.property(key);
@@ -95,6 +95,6 @@ public class ResolveFilter extends GenerateFilter {
 
   void buildPage(int start, int length) {
     if (start > 0) criteria.setFirstResult(start);
-    if (length > 0) criteria.setFetchSize(length);
+    if (length > 0) criteria.setMaxResults(length);
   }
 }

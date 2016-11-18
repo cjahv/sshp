@@ -74,7 +74,7 @@ public class GenerateKey {
     return generateAlias(getAliasIndex(key));
   }
 
-  public String generateAlias(int index) {
+  public static String generateAlias(int index) {
     return "_S" + index;
   }
 }

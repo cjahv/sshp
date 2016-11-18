@@ -1,5 +1,7 @@
 package com.sshp.plugins.hibernate.select;
 
+import com.linkcubic.model.entity.product.Product;
+import com.sshp.core.exception.InsideException;
 import com.sshp.core.model.entity.BaseEntityImpl;
 import com.sshp.mcv.entity.ReEntityImpl;
 import com.sshp.plugins.hibernate.core.KeyCore;
@@ -8,10 +10,13 @@ import com.sshp.plugins.hibernate.core.filter.Filter;
 import com.sshp.plugins.hibernate.core.filter.Order;
 import com.sshp.plugins.hibernate.core.filter.Other;
 import org.apache.commons.lang3.ArrayUtils;
+import org.hibernate.CacheMode;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Projection;
 import org.hibernate.sql.JoinType;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.*;
 
 /**
@@ -28,6 +33,22 @@ public class DataFilter<T extends BaseEntityImpl> extends KeyCore {
   ResolveFilter resolveFilter;
 
   Class<T> entityClass;
+
+  public DataFilter(){
+    super();
+    Class thisClass = getClass();
+    Type genericSuperclass = thisClass.getGenericSuperclass();
+    if (genericSuperclass != null && genericSuperclass instanceof ParameterizedType) {
+      ParameterizedType type = (ParameterizedType) genericSuperclass;
+      Type[] types = type.getActualTypeArguments();
+      if (types.length > 0) {
+        //noinspection unchecked
+        entityClass = (Class<T>) types[0];
+      }
+    }
+    Criteria criteria = getSession().createCriteria(entityClass);
+    resolveFilter = new ResolveFilter(criteria);
+  }
 
   public DataFilter(Class<T> tClass) {
     super();
@@ -51,6 +72,7 @@ public class DataFilter<T extends BaseEntityImpl> extends KeyCore {
 
   public DataFilter<T> filter(Filter... filters) {
     for (Filter filter : filters) {
+      if(filter==null) continue;
       if (!existDeleteStatus && filter.getName().charAt(0) == 'd' && filter.getName().charAt(6) == 'S' && filter.getName().equals("deleteStatus")) {
         existDeleteStatus = true;
       }
@@ -144,7 +166,15 @@ public class DataFilter<T extends BaseEntityImpl> extends KeyCore {
     return this;
   }
 
+  public DataFilter<T> cache(CacheMode cacheMode, String cacheName) {
+    return null;
+  }
+
   public String[] getKeys() {
     return keys;
+  }
+
+  public Filter[] getFilter(){
+    return this.filters.toArray(new Filter[this.filters.size()]);
   }
 }

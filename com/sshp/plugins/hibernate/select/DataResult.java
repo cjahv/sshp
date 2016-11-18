@@ -1,5 +1,6 @@
 package com.sshp.plugins.hibernate.select;
 
+import com.linkcubic.model.entity.Seo;
 import com.sshp.core.model.entity.BaseEntityImpl;
 import com.sshp.plugins.hibernate.exception.DataFilterException;
 import org.apache.log4j.Logger;

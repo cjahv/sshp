@@ -24,19 +24,10 @@ import java.util.Date;
  * 创建日期 ：16/8/13
  */
 public abstract class BaseController<T extends BaseEntityImpl> extends MvcManage<T> {
-  private ThreadLocal<ModelMap> modelMapThread = new ThreadLocal<>();//视图结果数据线程池
-  private ThreadLocal<HttpServletRequest> requestThread = new ThreadLocal<>();//request线程池
-  private ThreadLocal<HttpServletResponse> responseThread = new ThreadLocal<>();//response线程池
+  protected ThreadLocal<ModelMap> modelMapThread = new ThreadLocal<>();//视图结果数据线程池
+  protected ThreadLocal<HttpServletRequest> requestThread = new ThreadLocal<>();//request线程池
+  protected ThreadLocal<HttpServletResponse> responseThread = new ThreadLocal<>();//response线程池
   protected BaseService<T> service;
-
-  @ModelAttribute
-  public void setServletAPI(HttpServletRequest request, HttpServletResponse response, ModelMap modelMap) {
-    modelMapThread.set(modelMap);
-    requestThread.set(request);
-    responseThread.set(response);
-    request.setAttribute("time", System.currentTimeMillis());
-    service = SpringBean.getService(entityClass);
-  }
 
   protected JsonResult json() {
     return new JsonResult();
@@ -64,6 +55,10 @@ public abstract class BaseController<T extends BaseEntityImpl> extends MvcManage
 
   protected ModelMap model() {
     return modelMapThread.get();
+  }
+
+  protected void addModel(String key, Object val) {
+    modelMapThread.get().put(key, val);
   }
 
   protected String getRequestIp() {

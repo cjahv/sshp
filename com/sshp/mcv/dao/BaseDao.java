@@ -1,6 +1,8 @@
 package com.sshp.mcv.dao;
 
 import com.sshp.config.SpringBean;
+import com.sshp.core.model.dto.page.Page;
+import com.sshp.core.model.dto.result.PageResult;
 import com.sshp.core.model.entity.BaseEntityImpl;
 import com.sshp.mcv.entity.ReEntityImpl;
 import com.sshp.mcv.exception.MVCException;
@@ -16,6 +18,7 @@ import com.sshp.plugins.hibernate.select.DataFilter;
 import com.sshp.plugins.hibernate.select.DataResult;
 import com.sshp.plugins.hibernate.update.Update;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 
 
 /**
@@ -40,18 +43,23 @@ public class BaseDao<T extends BaseEntityImpl> extends MvcManage<T> implements B
   }
 
   @Override
-  public long count() {
-    return get("id:count").getLongValue();
+  public Integer count() {
+    return get("id:count").getInteger();
   }
 
   @Override
-  public long count(Filter... filters) {
-    return get("id:count", filters).getLongValue();
+  public Integer count(Filter... filters) {
+    return get("id:count", filters).getInteger();
   }
 
   @Override
   public T get(Long id) {
     return new DataResult<>(get().filter(Filter.eq("id", id))).entity();
+  }
+
+  @Override
+  public T get(String key, Long id) {
+    return new DataResult<>(get().key(key).filter(Filter.eq("id", id))).entity();
   }
 
   private DataFilter<T> get() {
@@ -112,6 +120,19 @@ public class BaseDao<T extends BaseEntityImpl> extends MvcManage<T> implements B
   }
 
   @Override
+  public PageResult get(Page<T> page) {
+    Integer count = null, countAll = null;
+    DataFilter<T> dataFilter = page.filter(entityClass);
+    if (page.isAutoCount()) {
+      count = count(dataFilter.getFilter());
+    }
+    if (page.isAutoCountAll()) {
+      countAll = count();
+    }
+    return page.getResult(new DataResult<>(dataFilter).list(), count, countAll);
+  }
+
+  @Override
   public int save(T entity) {
     if (entity.getId() == null) {
       return new Insert<>().exec(entity);
@@ -144,7 +165,7 @@ public class BaseDao<T extends BaseEntityImpl> extends MvcManage<T> implements B
   public int delete(Filter... filters) {
     if (entityClass.isAssignableFrom(ReEntityImpl.class)) {
       return logicDelete(filters);
-    }else {
+    } else {
       return new Delete<T>().exec(entityClass, filters);
     }
   }
@@ -172,7 +193,7 @@ public class BaseDao<T extends BaseEntityImpl> extends MvcManage<T> implements B
         throw new MVCException(e);
       }
       return new Update<>().exec("deleteStatus", entity, filters);
-    }else {
+    } else {
       throw new MVCException("The tombstone must inherit reEntity");
     }
   }
@@ -200,7 +221,7 @@ public class BaseDao<T extends BaseEntityImpl> extends MvcManage<T> implements B
         throw new MVCException(e);
       }
       return new Update<>().exec("deleteStatus", entity, filters);
-    }else {
+    } else {
       throw new MVCException("The tombstone must inherit reEntity");
     }
   }
@@ -208,5 +229,9 @@ public class BaseDao<T extends BaseEntityImpl> extends MvcManage<T> implements B
   @Override
   public Query getNamedQuery(String name) {
     return getSession().getNamedQuery(name);
+  }
+
+  public SQLQuery executeSql(String sql) {
+    return getSession().createSQLQuery(sql);
   }
 }

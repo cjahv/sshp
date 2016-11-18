@@ -22,66 +22,71 @@ public class RedisClient {
     this.namespaces = namespaces;
   }
 
-  public byte[] get(final String key) {
+  public byte[] get(final Object key) {
     return (byte[]) getRedisTemplate().execute((RedisCallback) connection -> connection.get(rawKey(key)));
   }
 
-  public int getInt(String key) {
+  public int getInt(Object key) {
     Object val = get(key);
     if (val == null) throw new SshpRedisException(READ_NULL);
     return (int) val;
   }
 
-  public long getLongValue(String key) {
+  public long getLongValue(Object key) {
     Object val = get(key);
     if (val == null) throw new SshpRedisException(READ_NULL);
     return (long) val;
   }
 
-  public float getFloatValue(String key) {
+  public float getFloatValue(Object key) {
     Object val = get(key);
     if (val == null) throw new SshpRedisException(READ_NULL);
     return (float) val;
   }
 
-  public double getDoubleValue(String key) {
+  public double getDoubleValue(Object key) {
     Object val = get(key);
     if (val == null) throw new SshpRedisException(READ_NULL);
     return (double) val;
   }
 
-  public boolean getBool(String key) {
+  public boolean getBool(Object key) {
     Object val = get(key);
     if (val == null) throw new SshpRedisException(READ_NULL);
     return Objects.equals(true, val);
   }
 
-  public boolean getBoolValue(String key) {
+  public boolean getBoolValue(Object key) {
     Object val = get(key);
     return val != null && "true".equals(val) || Objects.equals(true, val) || Objects.equals(1, val);
   }
 
-  public Integer getInteger(String key) {
-    return Integer.parseInt(getString(key));
+  public Integer getInteger(Object key) {
+    String result = getString(key);
+    return result == null ? null : Integer.parseInt(result);
   }
 
-  public Long getLong(String key) {
-    return Long.parseLong(getString(key));
+  public Long getLong(Object key) {
+    String result = getString(key);
+    return result == null ? null : Long.parseLong(result);
   }
 
-  public Float getFloat(String key) {
-    return Float.parseFloat(getString(key));
+  public Float getFloat(Object key) {
+    String result = getString(key);
+    return result == null ? null : Float.parseFloat(getString(key));
   }
 
-  public Double getDouble(String key) {
-    return Double.parseDouble(getString(key));
+  public Double getDouble(Object key) {
+    String result = getString(key);
+    return result == null ? null : Double.parseDouble(getString(key));
   }
 
-  public String getString(String key) {
-    return new String(get(key));
+  public String getString(Object key) {
+    byte[] result = get(key);
+    return result == null ? null : new String(result);
   }
 
-  public void set(final String key, final Object value, final long liveTime) {
+  public void set(final Object key, final Object value, final long liveTime) {
     getRedisTemplate().execute((RedisCallback) connection -> {
       byte[] k = rawKey(key);
       connection.set(k, rawHashKey(value));
@@ -92,20 +97,20 @@ public class RedisClient {
     });
   }
 
-  public void set(final String key, final Object value) {
+  public void set(final Object key, final Object value) {
     set(key, value, 0);
   }
 
-  public <T> T execute(RedisCallback<T> action){
+  public <T> T execute(RedisCallback<T> action) {
     return (T) getRedisTemplate().execute(action);
   }
 
-  private byte[] rawKey(String key) {
+  private byte[] rawKey(Object key) {
     return (base_namespace + namespaces + key).getBytes();
   }
 
   private <T> byte[] rawHashKey(T hashKey) {
-    if(hashKey==null) return null;
+    if (hashKey == null) return null;
     if (hashKey instanceof byte[]) {
       return (byte[]) hashKey;
     }
@@ -116,7 +121,7 @@ public class RedisClient {
   }
 
   private RedisTemplate getRedisTemplate() {
-    if(redisTemplate==null) redisTemplate = SpringBean.getBean(RedisTemplate.class);
+    if (redisTemplate == null) redisTemplate = SpringBean.getBean(RedisTemplate.class);
     return redisTemplate;
   }
 

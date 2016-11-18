@@ -14,8 +14,9 @@ public interface Page<T extends BaseEntityImpl> {
    * 获取条件筛选器
    *
    * @return 条件筛选器
+   * @param entityClass 实体类型
    */
-  DataFilter<T> filter();
+  DataFilter<T> filter(Class<T> entityClass);
 
   /**
    * 获取分页结果集

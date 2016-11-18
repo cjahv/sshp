@@ -1,5 +1,7 @@
 package com.sshp.mcv.manage;
 
+import com.sshp.core.model.dto.page.Page;
+import com.sshp.core.model.dto.result.PageResult;
 import com.sshp.core.model.entity.BaseEntityImpl;
 import com.sshp.plugins.hibernate.core.filter.Filter;
 import com.sshp.plugins.hibernate.core.filter.Order;
@@ -7,6 +9,7 @@ import com.sshp.plugins.hibernate.core.impl.Condition;
 import com.sshp.plugins.hibernate.select.DataFilter;
 import com.sshp.plugins.hibernate.select.DataResult;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 
 /**
  * 内容摘要 ：基础数据层和基础业务层接口
@@ -19,7 +22,7 @@ public interface BaseServiceAndDaoImpl<T extends BaseEntityImpl> {
    *
    * @return long
    */
-  long count();
+  Integer count();
 
   /**
    * 更具条件求总数
@@ -27,15 +30,29 @@ public interface BaseServiceAndDaoImpl<T extends BaseEntityImpl> {
    * @param filters 条件
    * @return long
    */
-  long count(Filter... filters);
+  Integer count(Filter... filters);
 
   /**
-   * 更具id获取一个实体
+   * 根据id获取一个实体
    *
    * @param id 实体id
    * @return T 没查到返回null
    */
   T get(Long id);
+
+  /**
+   * 根据id和key获取一个实体的指定数据
+   *
+   * @param key 字段列表，遵循key语法
+   *            <ul>
+   *             <li>* 全部字段</li>
+   *             <li>{xxx} 排除xxx字段，必须紧跟在*前面</li>
+   *             <li>alis[key1,key2, ...] alis下面的key1,key2, ... 字段</li>
+   *            </ul>
+   * @param id 实体id
+   * @return T 没查到返回null
+   */
+  T get(String key, Long id);
 
   /**
    * 查询所以对象的指定字段
@@ -153,6 +170,14 @@ public interface BaseServiceAndDaoImpl<T extends BaseEntityImpl> {
   DataResult<T> get(DataFilter<T> filter);
 
   /**
+   * 获取分页数据
+   * @param page 分页对象
+   * @return 分页结果集
+   * @see PageResult
+   */
+  PageResult get(Page<T> page);
+
+  /**
    * 保存一个对象
    *
    * @param entity 对象实体
@@ -221,4 +246,12 @@ public interface BaseServiceAndDaoImpl<T extends BaseEntityImpl> {
    * 通过配置文件获取查询
    */
   Query getNamedQuery(String name);
+
+  /**
+   * 执行 sql
+   * @param sql 目标 sql
+   * @return SQLQuery
+   * @see SQLQuery
+   */
+  SQLQuery executeSql(String sql);
 }

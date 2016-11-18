@@ -4,6 +4,8 @@ import com.sshp.plugins.redis.RedisClient;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
@@ -14,9 +16,12 @@ import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
  */
 @Configuration
 @ConfigurationProperties(prefix = "project.redis")
+@Lazy(false)
 public class RedisConfig {
 
   @Bean
+  @Lazy(false)
+  @Primary
   @SuppressWarnings("SpringJavaAutowiringInspection")
   public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {
     RedisTemplate<String, Object> template = new RedisTemplate<>();
