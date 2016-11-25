@@ -9,6 +9,8 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
+import javax.persistence.Entity;
+
 /**
  * 内容摘要 ：
  * <dl>
@@ -46,12 +48,18 @@ public class SpringBean implements ApplicationContextAware {
   public static <T extends BaseEntityImpl> BaseService<T> getService(Class<T> tClass) {
     if (tClass == null || !BaseEntityImpl.class.isAssignableFrom(tClass))
       return (BaseService<T>) getBean(applicationContext.getBeanNamesForType(BaseService.class)[0]);
-    return (BaseService<T>) getBean(StringUtil.updateInitialLower(tClass.getSimpleName()) + "BaseService");
+    return (BaseService<T>) getBean(getServiceOrDaoBaseName(tClass) + "BaseService");
   }
 
   public static <T extends BaseEntityImpl> BaseDao<T> getDao(Class<T> tClass) {
     if (tClass == null || !BaseEntityImpl.class.isAssignableFrom(tClass))
       return (BaseDao<T>) getBean(applicationContext.getBeanNamesForType(BaseDao.class)[0]);
-    return (BaseDao<T>) getBean(StringUtil.updateInitialLower(tClass.getSimpleName()) + "BaseDao");
+    return (BaseDao<T>) getBean(getServiceOrDaoBaseName(tClass) + "BaseDao");
+  }
+
+  private static <T extends BaseEntityImpl> String getServiceOrDaoBaseName(Class<T> tClass) {
+    Entity entity = tClass.getAnnotation(Entity.class);
+    if(entity.name().length()==0) return StringUtil.updateInitialLower(tClass.getSimpleName());
+    return entity.name();
   }
 }

@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import javax.persistence.Entity;
 
 /**
  * 内容摘要 ：自动装载 hibernate 的所有 model 的 service 和 dao
@@ -34,22 +35,22 @@ public class AutoConfigServiceAndDao {
    * 加载默认的service,dao
    */
   @PostConstruct
-  private void loadDefaultMvcBean() {
+  private void loadDefaultMvcBean() throws ClassNotFoundException {
     for (String name : sessionFactory.getAllClassMetadata().keySet()) {
-      try {
-        Class<?> defaultClass = Class.forName(name);
-        String defaultName = StringUtil.updateInitialLower(defaultClass.getSimpleName());
-        String defaultDaoName = defaultName + "BaseDao";
-        String defaultServiceName = defaultName + "BaseService";
-        BeanDefinitionBuilder builderDao = BeanDefinitionBuilder.rootBeanDefinition(BaseDao.class);
-        builderDao.addConstructorArgValue(defaultClass);
-        BeanDefinitionBuilder builderService = BeanDefinitionBuilder.rootBeanDefinition(BaseService.class);
-        builderService.addConstructorArgValue(defaultClass);
-        postProcessor.beanDefinitionRegistry.registerBeanDefinition(defaultDaoName, builderDao.getBeanDefinition());
-        postProcessor.beanDefinitionRegistry.registerBeanDefinition(defaultServiceName, builderService.getBeanDefinition());
-      } catch (ClassNotFoundException e) {
-        throw new InvalidPropertyException(this.getClass(), name, "not find class: " + name, e);
-      }
+      Class<?> defaultClass = Class.forName(name);
+      String defaultName;
+      Entity entity = defaultClass.getAnnotation(Entity.class);
+      if (entity.name().length() == 0)
+        defaultName = StringUtil.updateInitialLower(defaultClass.getSimpleName());
+      else defaultName = entity.name();
+      String defaultDaoName = defaultName + "BaseDao";
+      String defaultServiceName = defaultName + "BaseService";
+      BeanDefinitionBuilder builderDao = BeanDefinitionBuilder.rootBeanDefinition(BaseDao.class);
+      builderDao.addConstructorArgValue(defaultClass);
+      BeanDefinitionBuilder builderService = BeanDefinitionBuilder.rootBeanDefinition(BaseService.class);
+      builderService.addConstructorArgValue(defaultClass);
+      postProcessor.beanDefinitionRegistry.registerBeanDefinition(defaultDaoName, builderDao.getBeanDefinition());
+      postProcessor.beanDefinitionRegistry.registerBeanDefinition(defaultServiceName, builderService.getBeanDefinition());
     }
   }
 }
