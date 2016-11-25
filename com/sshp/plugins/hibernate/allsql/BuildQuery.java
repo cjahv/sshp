@@ -1,5 +1,6 @@
 package com.sshp.plugins.hibernate.allsql;
 
+import com.sshp.core.model.entity.BaseEntityImpl;
 import com.sshp.plugins.hibernate.allsql.annotation.AliasEntity;
 import com.sshp.plugins.hibernate.allsql.annotation.HqlQuery;
 import com.sshp.plugins.hibernate.allsql.annotation.SqlQuery;
@@ -16,6 +17,7 @@ import org.hibernate.persister.entity.SingleTableEntityPersister;
 import org.springframework.aop.ProxyMethodInvocation;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -96,6 +98,13 @@ public class BuildQuery extends SessionCore {
             Reflex.setValue(target, "id", oo[j]);
           }else {
             String m = propertyMap.get(kp[1]);
+            Method method = Reflex.getSetMethod(m, targetEntity.ws());
+            Type[] types = method.getGenericParameterTypes();
+            if (types.length > 0 && sessionFactory.getAllClassMetadata().get(types[0].getTypeName()) != null) {
+              Object o1 = Reflex.constructor((Class<?>) types[0]);
+              Reflex.setValue(o1, "id", oo[j]);
+              oo[j] = o1;
+            }
             Reflex.setValue(target, m, oo[j]);
           }
         }else if(aliasEntity!=null){
@@ -103,8 +112,7 @@ public class BuildQuery extends SessionCore {
           if (ki != -1) {
             String aliasProperty = aliasEntity.as()[ki];
             Object as = getAs(target, aliasProperty);
-            HashMap<String, String> alisMap = aliasPropertyMap.get(as.getClass());
-            if(alisMap==null) alisMap = getPropertyMap(as.getClass());
+            HashMap<String, String> alisMap = aliasPropertyMap.computeIfAbsent(as.getClass(), k -> getPropertyMap(as.getClass()));
             String m = alisMap.get(kp[1]);
             Reflex.setValue(as, m, oo[j]);
           }
