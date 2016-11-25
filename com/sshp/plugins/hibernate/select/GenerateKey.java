@@ -2,6 +2,7 @@ package com.sshp.plugins.hibernate.select;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Criteria;
+import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.sql.JoinType;
 
 import java.util.HashMap;
@@ -14,6 +15,8 @@ import java.util.Map;
  */
 public class GenerateKey {
   Criteria criteria;
+  DetachedCriteria detachedCriteria;
+
   public Map<String, Integer> aliasMap = new HashMap<>();
   public Map<String, String> aliasSourMap = new HashMap<>();
   Map<String, JoinType> joinType;

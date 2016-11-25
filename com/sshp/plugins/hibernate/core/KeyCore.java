@@ -16,15 +16,15 @@ import java.util.Set;
  * 创建人　 ：陈佳慧
  * 创建日期 ：16/8/14
  */
-public abstract class KeyCore extends SessionCore {
+public abstract class KeyCore<T extends BaseEntityImpl> extends SessionCore<T> {
 
-  protected <T extends BaseEntityImpl> String[] compileKeys(String keys, Class<T> entityClass) {
+  protected String[] compileKeys(String keys, Class<T> entityClass) {
     keys = compileKey(keys);
     if (keys.indexOf('*') >= 0||keys.indexOf('}') > 0) return compileHash(StringUtils.split(keys, ','), entityClass);
     else return StringUtils.split(keys, ',');
   }
 
-  private <T extends BaseEntityImpl> String[] compileHash(String[] keys, Class<T> entityClass) {
+  private String[] compileHash(String[] keys, Class<T> entityClass) {
     Map<String, ClassMetadata> map = sessionFactory.getAllClassMetadata();
     Set<String> keySet = new HashSet<>();
     for (String key : keys) {

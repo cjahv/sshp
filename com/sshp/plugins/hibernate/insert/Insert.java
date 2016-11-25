@@ -10,7 +10,7 @@ import java.util.List;
  * 创建人　 ：陈佳慧
  * 创建日期 ：16/8/13
  */
-public class Insert<T extends BaseEntityImpl> extends SessionCore {
+public class Insert<T extends BaseEntityImpl> extends SessionCore<T> {
 
   public int exec(T entity) {
     getSession().save(entity);

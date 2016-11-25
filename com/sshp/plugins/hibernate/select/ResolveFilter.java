@@ -23,6 +23,10 @@ public class ResolveFilter extends GenerateFilter {
     this.criteria = criteria;
   }
 
+  ResolveFilter(DetachedCriteria criteria) {
+    this.detachedCriteria = criteria;
+  }
+
   void buildKey(String[] keys) {
     ProjectionList pList = Projections.projectionList();
     if (keys != null && keys.length > 0) {
@@ -79,10 +83,10 @@ public class ResolveFilter extends GenerateFilter {
         String name = order.getPropertyName();
         int split = name.lastIndexOf('.');
         if (split > 0) {
-          String firstName = name.substring(0, split);
-          String lastName = name.substring(split);
-          String alias = super.generateAlias(firstName);
-          Reflex.set(order, "propertyName", alias + lastName);
+          String alias = super.generateAlias(name);
+          if(!alias.equals(name)){
+            Reflex.set(order, "propertyName", alias);
+          }
         }
         criteria.addOrder(order);
       }

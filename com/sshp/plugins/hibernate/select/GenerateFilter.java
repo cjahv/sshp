@@ -4,6 +4,7 @@ import com.sshp.plugins.hibernate.core.filter.Filter;
 import com.sshp.utils.DateUtil;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
 
 import java.util.ArrayList;
@@ -75,7 +76,9 @@ public class GenerateFilter extends GenerateKey {
         criterion = Restrictions.isEmpty(name);
         break;
       case notEmpty:
-        criterion = Restrictions.isNotEmpty(name);
+//        criterion = Restrictions.isNotEmpty(name);
+//        criterion = Property.forName(name).isNotEmpty();
+        criterion = Restrictions.and(Property.forName(name).isNotNull(), Restrictions.ne(name, ""));
         break;
       case between:
         Object[] values = (Object[]) filter.getValue();

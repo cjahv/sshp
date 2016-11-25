@@ -14,7 +14,7 @@ import java.util.Map;
  * 创建人　 ：陈佳慧
  * 创建日期 ：16/8/14
  */
-public abstract class WhereCore<T extends BaseEntityImpl> extends KeyCore {
+public abstract class WhereCore<T extends BaseEntityImpl> extends KeyCore<T> {
 
   public WhereResult buildFilter2Hql(Filter... filters) {
     StringBuilder builder = new StringBuilder();

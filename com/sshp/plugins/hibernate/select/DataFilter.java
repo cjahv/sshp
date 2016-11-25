@@ -12,6 +12,8 @@ import com.sshp.plugins.hibernate.core.filter.Other;
 import org.apache.commons.lang3.ArrayUtils;
 import org.hibernate.CacheMode;
 import org.hibernate.Criteria;
+import org.hibernate.HibernateException;
+import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Projection;
 import org.hibernate.sql.JoinType;
 
@@ -25,7 +27,8 @@ import java.util.*;
  * 创建日期 ：16/8/18
  */
 @SuppressWarnings("WeakerAccess")
-public class DataFilter<T extends BaseEntityImpl> extends KeyCore {
+public class DataFilter<T extends BaseEntityImpl> extends KeyCore<T> {
+
   private int start = 0;
   private int length = 400;
 
@@ -34,7 +37,7 @@ public class DataFilter<T extends BaseEntityImpl> extends KeyCore {
 
   Class<T> entityClass;
 
-  public DataFilter(){
+  public DataFilter() {
     super();
     Class thisClass = getClass();
     Type genericSuperclass = thisClass.getGenericSuperclass();
@@ -46,15 +49,23 @@ public class DataFilter<T extends BaseEntityImpl> extends KeyCore {
         entityClass = (Class<T>) types[0];
       }
     }
-    Criteria criteria = getSession().createCriteria(entityClass);
-    resolveFilter = new ResolveFilter(criteria);
+    setCriteria();
   }
 
   public DataFilter(Class<T> tClass) {
     super();
     this.entityClass = tClass;
-    Criteria criteria = getSession().createCriteria(entityClass);
-    resolveFilter = new ResolveFilter(criteria);
+    setCriteria();
+  }
+
+  private void setCriteria() {
+    Criteria criteria;
+    if (getSession() != null) {
+      criteria = getSession().createCriteria(entityClass);
+      resolveFilter = new ResolveFilter(criteria);
+    } else {
+      resolveFilter = new ResolveFilter(DetachedCriteria.forClass(entityClass));
+    }
   }
 
   private String[] keys;
@@ -72,8 +83,8 @@ public class DataFilter<T extends BaseEntityImpl> extends KeyCore {
 
   public DataFilter<T> filter(Filter... filters) {
     for (Filter filter : filters) {
-      if(filter==null) continue;
-      if (!existDeleteStatus && filter.getName().charAt(0) == 'd' && filter.getName().charAt(6) == 'S' && filter.getName().equals("deleteStatus")) {
+      if (filter == null) continue;
+      if (!existDeleteStatus && filter.getName().length() == 12 && filter.getName().charAt(0) == 'd' && filter.getName().charAt(6) == 'S' && filter.getName().equals("deleteStatus")) {
         existDeleteStatus = true;
       }
       this.filters.add(filter);
@@ -94,12 +105,30 @@ public class DataFilter<T extends BaseEntityImpl> extends KeyCore {
   }
 
   private void build() {
+    if (resolveFilter.criteria == null && getSession() == null) {
+      throw new HibernateException("不能获取到 session");
+    } else if (resolveFilter.criteria == null) {
+      resolveFilter.criteria = resolveFilter.detachedCriteria.getExecutableCriteria(getSession());
+    }
     resolveFilter.buildKey(this.keys);
     if (entityClass.isAssignableFrom(ReEntityImpl.class) && !existDeleteStatusFilter()) {
       this.filter(Filter.eq("deleteStatus", false));
     }
     resolveFilter.buildFilter(this.filters);
     resolveFilter.buildOrder(this.orders);
+    for (Other other : this.others) {
+      switch (other.getIndex()) {
+        case 0:
+          this.one();
+          break;
+        case 1:
+          this.all();
+          break;
+        case 2:
+          this.length((Integer) other.getArgs(1));
+          this.start((Integer) other.getArgs(0));
+      }
+    }
     resolveFilter.buildPage(this.start, this.length);
     list = resolveFilter.list();
   }
@@ -133,16 +162,10 @@ public class DataFilter<T extends BaseEntityImpl> extends KeyCore {
     return resolveFilter.isGroup;
   }
 
+  private Set<Other> others = new HashSet<>();
+
   public DataFilter<T> other(Other other) {
-    switch (other.getIndex()) {
-      case 0:
-        return this.one();
-      case 1:
-        return this.all();
-      case 2:
-        this.length((Integer) other.getArgs(1));
-        this.start((Integer) other.getArgs(0));
-    }
+    this.others.add(other);
     return this;
   }
 
@@ -174,7 +197,11 @@ public class DataFilter<T extends BaseEntityImpl> extends KeyCore {
     return keys;
   }
 
-  public Filter[] getFilter(){
+  public Filter[] getFilter() {
     return this.filters.toArray(new Filter[this.filters.size()]);
+  }
+
+  public static <T extends BaseEntityImpl> DataFilter<T> load(Class<T> tClass) {
+    return new DataFilter<T>(tClass);
   }
 }
