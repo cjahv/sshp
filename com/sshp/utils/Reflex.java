@@ -39,11 +39,7 @@ public class Reflex {
    * 通过字段名获取get方法
    */
   public static Method getGetMethod(String fieldName, Class c) {
-    Method[] methods = methodCache.get(c);
-    if (methods == null) {
-      methods = c.getMethods();
-      methodCache.put(c, methods);
-    }
+    Method[] methods = methodCache.computeIfAbsent(c, k -> c.getMethods());
     Set<Method> set = new HashSet<>();
     String isName = "is" + StringUtil.updateInitial(fieldName);
     String getName = "get" + StringUtil.updateInitial(fieldName);
@@ -59,11 +55,7 @@ public class Reflex {
    * 通过字段名获取set方法
    */
   public static Method getSetMethod(String fieldName, Class c) {
-    Method[] methods = methodCache.get(c);
-    if (methods == null) {
-      methods = c.getMethods();
-      methodCache.put(c, methods);
-    }
+    Method[] methods = methodCache.computeIfAbsent(c, k -> c.getMethods());
     Set<Method> methods1 = new HashSet<>();
     for (Method method : methods) {
       if (method.getName().equals("set" + StringUtil.updateInitial(fieldName))) {
@@ -78,13 +70,13 @@ public class Reflex {
       else if(Object.class.equals(types[0]))iterator.remove();
     }
     if(methods1.size()==1) return methods1.iterator().next();
-    return null;
+    throw new InsideException(methods1.size() > 1 ? "找到了多个 set 方法" : "没有找到 set 方法");
   }
 
   /**
    * 通过字段名获取方法
    */
-  public static Method getModel(Class c, String fieldName, Class... classes) {
+  public static Method getModel(Class c, String fieldName, Class<?>... classes) {
     try {
       return c.getMethod(fieldName, classes);
     } catch (NoSuchMethodException e) {
