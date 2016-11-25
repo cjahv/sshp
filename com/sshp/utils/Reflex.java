@@ -3,7 +3,6 @@ package com.sshp.utils;
 
 import com.sshp.core.exception.InsideException;
 import org.apache.commons.lang3.ArrayUtils;
-import sun.reflect.CallerSensitive;
 
 import java.lang.reflect.*;
 import java.util.*;
@@ -65,11 +64,20 @@ public class Reflex {
       methods = c.getMethods();
       methodCache.put(c, methods);
     }
+    Set<Method> methods1 = new HashSet<>();
     for (Method method : methods) {
       if (method.getName().equals("set" + StringUtil.updateInitial(fieldName))) {
-        return method;
+        methods1.add(method);
       }
     }
+    if(methods1.size()==1) return methods1.iterator().next();
+    Iterator<Method> iterator = methods1.iterator();
+    while (iterator.hasNext()) {
+      Type[] types = iterator.next().getGenericParameterTypes();
+      if(types.length!=1)iterator.remove();
+      else if(Object.class.equals(types[0]))iterator.remove();
+    }
+    if(methods1.size()==1) return methods1.iterator().next();
     return null;
   }
 
@@ -102,7 +110,6 @@ public class Reflex {
    * @param val       被调用的对象
    * @param fieldName 字段名
    */
-  @CallerSensitive
   public static Object setValue(Object val, String fieldName, Object... objects) {
     Method method = getSetMethod(fieldName, val.getClass());
     if (method == null) throw new InsideException("没有获取到set方法:" + fieldName);
@@ -121,6 +128,18 @@ public class Reflex {
           }
         } else {
           throw new InsideException("不支持set方法泛型实现");
+        }
+      } else if(Enum.class.isAssignableFrom((Class<?>) type)){
+        Enum[] ena = ((Class<Enum>) type).getEnumConstants();
+        if (objects[i] instanceof Number) {
+          objects[i] = ena[(int) objects[i]];
+        } else if (objects[i] instanceof String) {
+          for (Enum en : ena) {
+            if(en.name().equals(objects[i])){
+              objects[i] = en;
+              break;
+            }
+          }
         }
       } else {
         if (!objects[i].getClass().equals(type) && Reflex.isWrapClass((Class) type)) {
@@ -180,12 +199,24 @@ public class Reflex {
    * @param value  值
    */
   public static void set(Object object, String field, Object value) {
+    set(object.getClass(), object, field, value);
+  }
+
+  /**
+   * 给对象的私有属性赋值
+   * @param c      目标类型
+   * @param object 操作对象
+   * @param field  属性名
+   * @param value  值
+   */
+  public static void set(Class c, Object object, String field, Object value) {
     try {
-      Field field1 = object.getClass().getDeclaredField(field);
+      Field field1 = c.getDeclaredField(field);
       field1.setAccessible(true);
       field1.set(object, value);
     } catch (NoSuchFieldException e) {
-      throw new InsideException("没有这个属性", e);
+      if(c.equals(Object.class)) throw new InsideException("没有这个属性", e);
+      set(c.getSuperclass(),object, field, value);
     } catch (IllegalAccessException e) {
       throw new InsideException("写入值类型错误", e);
     }

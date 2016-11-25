@@ -175,7 +175,7 @@ public interface BaseServiceAndDaoImpl<T extends BaseEntityImpl> {
    * @return 分页结果集
    * @see PageResult
    */
-  PageResult get(Page<T> page);
+  PageResult<T> get(Page page);
 
   /**
    * 保存一个对象

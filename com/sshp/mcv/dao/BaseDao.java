@@ -120,7 +120,7 @@ public class BaseDao<T extends BaseEntityImpl> extends MvcManage<T> implements B
   }
 
   @Override
-  public PageResult get(Page<T> page) {
+  public PageResult<T> get(Page page) {
     Integer count = null, countAll = null;
     DataFilter<T> dataFilter = page.filter(entityClass);
     if (page.isAutoCount()) {

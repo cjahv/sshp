@@ -1,12 +1,17 @@
 package com.sshp.core.model.dto.result;
 
 import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.sshp.core.model.entity.BaseEntityImpl;
 
-public class JsonResult {
+import java.io.Serializable;
+import java.util.List;
 
+public class JsonResult<T extends BaseEntityImpl> implements Serializable {
   private boolean success;            //结果状态
   private String msg;                    //信息
   private Object data;                //结果对象
+  private List<T> list;
   private int hash;
 
   public JsonResult() {
@@ -37,12 +42,24 @@ public class JsonResult {
   }
 
   public Object getData() {
+    if(data==null) return list;
     return data;
   }
 
   public JsonResult setData(Object data) {
     this.data = data;
     return this;
+  }
+
+  @JsonIgnore
+  public List<T> list(){
+    if(data==null) return list;
+    //noinspection unchecked
+    return (List<T>)data;
+  }
+
+  public void setList(List<T> list){
+    this.list = list;
   }
 
   @Override

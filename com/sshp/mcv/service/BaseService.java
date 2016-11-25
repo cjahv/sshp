@@ -95,7 +95,7 @@ public class BaseService<T extends BaseEntityImpl> extends MvcManage<T> implemen
   }
 
   @Override
-  public PageResult get(Page<T> page) {
+  public PageResult<T> get(Page page) {
     return dao.get(page);
   }
 
