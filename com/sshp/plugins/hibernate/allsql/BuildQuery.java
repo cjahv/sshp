@@ -15,12 +15,11 @@ import org.hibernate.SQLQuery;
 import org.hibernate.metadata.ClassMetadata;
 import org.hibernate.persister.entity.SingleTableEntityPersister;
 import org.springframework.aop.ProxyMethodInvocation;
+import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * 执行查询
@@ -62,27 +61,64 @@ public class BuildQuery extends SessionCore {
         for (int i = 0; i < pc; i++) {
           query.setParameter(i, args[i]);
         }
+      } else {
+        Map<String, Object> argsMap = nameCount(sql);
+        if (argsMap != null) query.setProperties(argsMap);
       }
-      if(sql.substring(0,10).startsWith("select")){
+      if (sql.substring(0, 10).startsWith("select")) {
         String key = null;
         if (targetEntity != null) {
           key = sql.substring(7, sql.indexOf("from") - 1).trim();
-          if(key.contains("*")){
+          if (key.contains("*")) {
             ((SQLQuery) query).addEntity(targetEntity.ws());
             targetEntity = null;
           }
         }
         list = query.list();
-        if(targetEntity!=null)list=buildEntity(key,list);
-      }else {
+        if (targetEntity != null) list = buildEntity(key, list);
+      } else {
         return query.executeUpdate();
       }
     }
     return list;
   }
 
+  private Map<String, Object> nameCount(String sql) {
+    Set<String> names = new HashSet<>();
+    StringBuilder sb = null;
+    for (int i = 0; i < sql.length(); i++) {
+      switch (sql.charAt(i)) {
+        case ':':
+          sb = new StringBuilder();
+          break;
+        case ' ':
+          if (sb != null) {
+            names.add(sb.toString());
+            sb = null;
+          }
+          break;
+        default:
+          if (sb != null) sb.append(sql.charAt(i));
+      }
+    }
+    if (names.size() > 0) {
+      LocalVariableTableParameterNameDiscoverer u = new LocalVariableTableParameterNameDiscoverer();
+      String[] params = u.getParameterNames(invocation.getMethod());
+      Map<String, Object> map = new HashMap<>();
+      Iterator<String> iterator = names.iterator();
+      Object[] args = point.getArgs();
+      while (iterator.hasNext()) {
+        String name = iterator.next();
+        int index = ArrayUtils.indexOf(params, name);
+        if (index > -1) map.put(name, args[index]);
+      }
+      if (map.size() > 0) return map;
+    }
+    return null;
+  }
+
   private List buildEntity(String key, List list) {
-    String[] keys = StringUtils.split(key,',');
+    String[] keys = StringUtils.split(key, ',');
     HashMap<String, String> propertyMap = getPropertyMap(targetEntity.ws());
     HashMap<Class, HashMap<String, String>> aliasPropertyMap = new HashMap<>();
     List<Object> list1 = new ArrayList<>();
@@ -90,13 +126,13 @@ public class BuildQuery extends SessionCore {
       Object[] oo;
       if (keys.length == 1 && !(o instanceof Object[])) oo = new Object[]{o};
       else oo = (Object[]) o;
-      Object target=Reflex.constructor(targetEntity.ws());
+      Object target = Reflex.constructor(targetEntity.ws());
       for (int j = 0; j < oo.length; j++) {
-        String[] kp = StringUtils.split(keys[j],'.');
+        String[] kp = StringUtils.split(keys[j], '.');
         if (kp[0].equals(targetEntity.name())) {
-          if("id".equals(kp[1])){
+          if ("id".equals(kp[1])) {
             Reflex.setValue(target, "id", oo[j]);
-          }else {
+          } else {
             String m = propertyMap.get(kp[1]);
             Method method = Reflex.getSetMethod(m, targetEntity.ws());
             Type[] types = method.getGenericParameterTypes();
@@ -107,7 +143,7 @@ public class BuildQuery extends SessionCore {
             }
             Reflex.setValue(target, m, oo[j]);
           }
-        }else if(aliasEntity!=null){
+        } else if (aliasEntity != null) {
           int ki = ArrayUtils.indexOf(aliasEntity.name(), kp[0]);
           if (ki != -1) {
             String aliasProperty = aliasEntity.as()[ki];
@@ -141,7 +177,7 @@ public class BuildQuery extends SessionCore {
   public HashMap<String, String> getPropertyMap(Class c) {
     HashMap<String, String> propertyMap = new HashMap<>();
     ClassMetadata classMetadata = sessionFactory.getAllClassMetadata().get(c.getName());
-    String[] propertyNames= classMetadata.getPropertyNames();
+    String[] propertyNames = classMetadata.getPropertyNames();
     if (classMetadata instanceof SingleTableEntityPersister) {
       for (String propertyName : propertyNames) {
         String[] column = ((SingleTableEntityPersister) classMetadata).getPropertyColumnNames(propertyName);
@@ -155,10 +191,10 @@ public class BuildQuery extends SessionCore {
 
   private Object getAs(Object target, String aliasProperty) {
     String[] aps = StringUtils.split(aliasProperty, '.');
-    return getVal(target, aps,0);
+    return getVal(target, aps, 0);
   }
 
-  private Object getVal(Object target, String[] a,int i) {
+  private Object getVal(Object target, String[] a, int i) {
     Class c = target.getClass();
     Method method = Reflex.getGetMethod(a[i], c);
     Object v = Reflex.invoke(method, target);
@@ -166,7 +202,7 @@ public class BuildQuery extends SessionCore {
       v = Reflex.constructor(method.getReturnType());
       Reflex.setValue(target, a[i], v);
     }
-    if(a.length-1==i) return v;
+    if (a.length - 1 == i) return v;
     return getVal(v, a, i + 1);
   }
 
