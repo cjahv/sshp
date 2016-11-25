@@ -27,11 +27,16 @@ public class DataResult<T extends BaseEntityImpl> extends BuildEntity<T> {
     return list;
   }
 
+  public <K> List<K> result(Class<K> tClass) {
+    return list;
+  }
+
   public List<T> list() {
     if (this.list.size() == 0) return null;
-    if (this.list.get(0).getClass().equals(entityClass)) {
-      //noinspection unchecked
-      return list;
+    for (Object o : this.list) {
+      if(o==null) continue;
+      if(entityClass.equals(o.getClass())) return list;
+      else break;
     }
     List<T> list = new ArrayList<>();
     for (Object o : result()) {
