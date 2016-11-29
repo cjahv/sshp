@@ -1,5 +1,6 @@
 package com.sshp.config.hibernate;
 
+import com.sshp.core.exception.SystemException;
 import com.sshp.core.model.dto.result.JsonResult;
 import com.sshp.plugins.hibernate.allsql.BuildQuery;
 import com.sshp.plugins.hibernate.allsql.JoinResult;
@@ -21,10 +22,12 @@ import java.lang.reflect.Field;
 public class AllSqlAutoConfiguration {
 
   @Pointcut("@annotation(com.sshp.plugins.hibernate.allsql.annotation.HqlQuery)")
-  public void hqlAspect(){}
+  public void hqlAspect() {
+  }
 
   @Pointcut("@annotation(com.sshp.plugins.hibernate.allsql.annotation.SqlQuery)")
-  public void sqlAspect(){}
+  public void sqlAspect() {
+  }
 
   @Before("hqlAspect()")
   public void hqlAspectBefore(JoinPoint point) throws NoSuchFieldException, IllegalAccessException {
@@ -44,11 +47,13 @@ public class AllSqlAutoConfiguration {
     BuildQuery buildQuery = new BuildQuery(point, invocation);
     Object[] args = point.getArgs();
     for (int i = args.length - 1; i >= 0; i--) {
-      if (args[i] instanceof JoinResult) {
-        JoinResult joinResult = (JoinResult) args[i];
+      if (args[i] == null || args[i] instanceof JoinResult) {
+        JoinResult joinResult = args[i] == null ? new JoinResult() : (JoinResult) args[i];
         joinResult.setResult(buildQuery.result());
-        break;
+        args[i] = joinResult;
+        return;
       }
     }
+    throw new SystemException("无法找到注入参数");
   }
 }
