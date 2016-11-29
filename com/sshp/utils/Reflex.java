@@ -80,9 +80,7 @@ public class Reflex {
     try {
       return c.getMethod(fieldName, classes);
     } catch (NoSuchMethodException e) {
-      e.printStackTrace();
-      new InstantiationException("系统错误,错误的调用:" + fieldName).printStackTrace();
-      return null;
+      throw new InsideException("系统错误,错误的调用:" + fieldName, e);
     }
   }
 
