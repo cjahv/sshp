@@ -86,8 +86,9 @@ public class BuildQuery extends SessionCore {
   private Map<String, Object> nameCount(String sql) {
     Set<String> names = new HashSet<>();
     StringBuilder sb = null;
-    for (int i = 0; i < sql.length(); i++) {
-      switch (sql.charAt(i)) {
+    for (int i = 0; i < sql.length() + 1; i++) {
+      char s = i == sql.length() ? ' ' : sql.charAt(i);
+      switch (s) {
         case ':':
           sb = new StringBuilder();
           break;
@@ -98,7 +99,7 @@ public class BuildQuery extends SessionCore {
           }
           break;
         default:
-          if (sb != null) sb.append(sql.charAt(i));
+          if (sb != null) sb.append(s);
       }
     }
     if (names.size() > 0) {
