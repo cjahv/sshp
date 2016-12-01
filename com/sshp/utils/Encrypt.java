@@ -1,8 +1,6 @@
 package com.sshp.utils;
 
 import com.sshp.core.exception.InsideException;
-import sun.misc.BASE64Decoder;
-import sun.misc.BASE64Encoder;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -18,46 +16,6 @@ import java.security.NoSuchAlgorithmException;
  * base64加密可以指定字符集，可以解密
  */
 public class Encrypt {
-
-  /**
-   * md5加密
-   */
-  public static String e(String inputText) {
-    return md5(inputText);
-  }
-
-  /**
-   * 解密base64
-   */
-  public static String d(String inputText) {
-    return base64Decode(inputText);
-  }
-
-  /**
-   * 使用Base64加密
-   */
-  public static String base64Encode(String inputText) {
-    return new BASE64Encoder().encode(inputText.getBytes());
-  }
-
-  /**
-   * Base64解密
-   */
-  public static String base64Decode(String inputText) {
-    try {
-      return new String(new BASE64Decoder().decodeBuffer(inputText));
-    } catch (IOException e) {
-      return null;
-    }
-  }
-
-  /**
-   * 二次加密，应该破解不了了吧？
-   */
-  public static String md5AndSha(String inputText) {
-    return sha(md5(inputText));
-  }
-
   /**
    * md5加密
    */
@@ -108,14 +66,10 @@ public class Encrypt {
       MessageDigest m = MessageDigest.getInstance(algorithmName);
       m.update(inputText.getBytes("UTF8"));
       byte s[] = m.digest();
-      // m.digest(inputText.getBytes("UTF8"));
       return hex(s);
-    } catch (NoSuchAlgorithmException e) {
-      e.printStackTrace();
-    } catch (UnsupportedEncodingException e) {
-      e.printStackTrace();
+    } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
+      throw new InsideException(e);
     }
-    return null;
   }
 
   /**
