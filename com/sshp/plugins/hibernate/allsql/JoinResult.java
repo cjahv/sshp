@@ -8,7 +8,7 @@ import java.util.List;
  * 注入结果
  * Created by jahv on 2016/11/23.
  */
-public class JoinResult<T extends BaseEntityImpl> {
+public class JoinResult<T> {
   private Object result;
 
   public Object result() {
