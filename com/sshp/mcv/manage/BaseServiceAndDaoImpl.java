@@ -245,6 +245,7 @@ public interface BaseServiceAndDaoImpl<T extends BaseEntityImpl> {
   /**
    * 通过配置文件获取查询
    */
+  @Deprecated
   Query getNamedQuery(String name);
 
   /**
