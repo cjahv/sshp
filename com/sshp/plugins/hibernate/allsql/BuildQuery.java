@@ -92,6 +92,7 @@ public class BuildQuery extends SessionCore {
         case ':':
           sb = new StringBuilder();
           break;
+        case '\n':
         case ' ':
           if (sb != null) {
             names.add(sb.toString());
