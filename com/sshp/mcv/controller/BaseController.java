@@ -5,7 +5,6 @@ import com.sshp.core.exception.SystemException;
 import com.sshp.core.model.dto.result.JsonResult;
 import com.sshp.core.model.entity.BaseEntityImpl;
 import com.sshp.mcv.manage.MvcManage;
-import com.sshp.mcv.service.BaseService;
 import com.sshp.utils.DateUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.WebDataBinder;
@@ -23,8 +22,6 @@ import java.util.Date;
  * 创建日期 ：16/8/13
  */
 public abstract class BaseController<T extends BaseEntityImpl> extends MvcManage<T> {
-  protected BaseService<T> service;
-
   protected JsonResult json() {
     return new JsonResult();
   }
