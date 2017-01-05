@@ -1,6 +1,5 @@
 package com.sshp.mcv.controller;
 
-import com.linkcubic.utils.SessionUtil;
 import com.sshp.core.exception.SystemException;
 import com.sshp.core.model.dto.result.JsonResult;
 import com.sshp.core.model.entity.BaseEntityImpl;
@@ -10,9 +9,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.beans.PropertyEditorSupport;
 import java.util.Date;
 
@@ -28,26 +24,6 @@ public abstract class BaseController<T extends BaseEntityImpl> extends MvcManage
 
   protected JsonResult json(String error) {
     return new JsonResult(false, error);
-  }
-
-  protected HttpServletRequest request() {
-      return SessionUtil.getRequest();
-  }
-
-  protected HttpSession session() {
-    return request().getSession();
-  }
-
-  protected HttpServletResponse response() {
-      return SessionUtil.getResponse();
-  }
-
-  protected String getParameter(String key) {
-    return request().getParameter(key);
-  }
-
-  protected void model(String key,Object value) {
-      request().setAttribute(key, value);
   }
 
   @InitBinder
